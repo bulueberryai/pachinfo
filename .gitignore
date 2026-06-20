@@ -1,0 +1,6 @@
+.netlify/
+__pycache__/
+*.xlsx
+~$*.xlsx
+create_ringi.py
+.claude/

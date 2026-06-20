@@ -1,0 +1,32 @@
+name: PACHINFO daily update
+
+on:
+  schedule:
+    - cron: '0 22 * * *'   # 毎日07:00 JST (= 22:00 UTC)
+  workflow_dispatch:         # 手動実行も可能
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install feedparser requests beautifulsoup4
+
+      - name: Run update script
+        run: python pachinfo_scripts/update_news.py
+        env:
+          PYTHONIOENCODING: utf-8
+
+      - name: Deploy to Netlify
+        run: npx netlify-cli deploy --dir . --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

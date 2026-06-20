@@ -100,7 +100,10 @@ def build_sidebar_html(videos, updated):
       </div>
 <!-- SIDEBAR_END -->"""
 
-HTML_FILE = Path(__file__).parent.parent / "claude" / "index.html"
+if os.name == 'nt':
+    HTML_FILE = Path(__file__).parent.parent / "claude" / "index.html"
+else:
+    HTML_FILE = Path(__file__).parent.parent / "index.html"
 
 JST = timezone(timedelta(hours=9))
 
@@ -371,13 +374,14 @@ def update_html(news_html, sidebar_html, stats_html, char_js):
     return True
 
 
-LOG_FILE = Path(r"C:\Users\Public\pachinfo_log.txt")
+LOG_FILE = Path(r"C:\Users\Public\pachinfo_log.txt") if os.name == 'nt' else None
 
 def log(msg):
     line = f"[{datetime.now(JST).strftime('%Y-%m-%d %H:%M:%S')}] {msg}"
     print(line)
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(line + "\n")
+    if LOG_FILE:
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
 
 
 def main():

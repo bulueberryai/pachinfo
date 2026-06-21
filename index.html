@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PACHINFO - パチンコ業界ニュース</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #050810; }
+    ::-webkit-scrollbar-thumb { background: #0af4; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #0af; box-shadow: 0 0 6px #0af; }
+    body { background: #050810; }
+    .site { background: #050810; color: #c8d8f0; font-family: 'Noto Sans JP', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    .grid-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; background-image: linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px); background-size: 32px 32px; }
+    .header { position: relative; background: #060c18; border-bottom: 1px solid #0af; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
+    .header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, transparent, #0af, #f0a, #0af, transparent); }
+    .logo { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; color: #0af; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
+    .logo-dot { width: 10px; height: 10px; background: #0af; border-radius: 50%; }
+    .logo-sub { font-size: 10px; color: #58a; font-weight: 400; letter-spacing: 4px; display: block; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .live-badge { background: rgba(255,0,0,0.1); border: 1px solid #f44; color: #f88; font-size: 10px; padding: 2px 8px; border-radius: 2px; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+    .nav { background: #080f1e; border-bottom: 1px solid #1a2a40; display: flex; gap: 0; overflow-x: auto; }
+    .nav-item { padding: 10px 18px; font-size: 12px; color: #6888aa; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; letter-spacing: 1px; text-decoration: none; display: block; }
+    .nav-item:hover { color: #0af; }
+    .nav-item.active { color: #0af; border-bottom-color: #0af; background: rgba(0,170,255,0.05); }
+    .content { display: grid; grid-template-columns: 1fr 280px; gap: 0; flex: 1; overflow: hidden; min-height: 0; }
+    .main { padding: 16px; border-right: 1px solid #1a2a40; min-width: 0; overflow-y: auto; height: 100%; }
+    .sidebar { padding: 16px; min-width: 0; overflow-y: auto; height: 100%; }
+    .section-title { font-family: 'Orbitron', sans-serif; font-size: 11px; color: #0af; letter-spacing: 3px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .section-title::after { content:''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,170,255,0.4), transparent); }
+    .news-source { font-size: 10px; color: #0af; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+    .news-source::before { content:''; display:inline-block; width:6px; height:6px; border:1px solid currentColor; border-radius:50%; }
+    .news-featured { display: block; background: #080f1e; border: 1px solid #1a3060; border-left: 3px solid #0af; border-radius: 4px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: border-color 0.2s; text-decoration: none; color: inherit; }
+    .news-featured:hover { border-color: #0af; }
+    .news-tag { font-size: 9px; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; padding: 2px 8px; border-radius: 2px; display: inline-block; margin-bottom: 8px; }
+    .tag-hot   { background: rgba(255,0,170,0.08);  border: 1px solid #f0a; color: #f0a; }
+    .tag-new   { background: rgba(0,255,136,0.05);  border: 1px solid #0f8; color: #0f8; }
+    .tag-reg   { background: rgba(255,170,0,0.05);  border: 1px solid #fa0; color: #fa0; }
+    .tag-mfg   { background: rgba(170,0,255,0.05);  border: 1px solid #a0f; color: #a0f; }
+    .tag-store { background: rgba(0,204,255,0.06);  border: 1px solid #0cf; color: #0cf; }
+    .news-title { font-size: 14px; font-weight: 700; color: #d8eeff; line-height: 1.5; margin-bottom: 6px; }
+    .news-meta { font-size: 11px; color: #4a6a8a; display: flex; gap: 12px; }
+    .news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .news-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .news-card { display: block; background: #080f1e; border: 1px solid #1a2a40; border-left: 3px solid #1a2a40; border-radius: 4px; padding: 12px 14px; cursor: pointer; transition: border-color 0.2s; text-decoration: none; color: inherit; }
+    .news-card:hover { border-color: rgba(0,170,255,0.5); }
+    .news-card[data-tag="hot"]   { border-left-color: #f0a4; }
+    .news-card[data-tag="new"]   { border-left-color: #0f84; }
+    .news-card[data-tag="reg"]   { border-left-color: #fa04; }
+    .news-card[data-tag="mfg"]   { border-left-color: #a0f4; }
+    .news-card[data-tag="store"] { border-left-color: #0cf4; }
+    .news-card .news-title { font-size: 13px; }
+    .news-card .news-source { font-size: 9px; margin-bottom: 0; }
+    .up { color: #0f8; }
+    .down { color: #f44; }
+    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .stats-bar { background: #060c18; border-bottom: 1px solid #1a2a40; padding: 6px 20px; display: flex; gap: 24px; flex-wrap: wrap; }
+    .stats-group { display: flex; align-items: center; gap: 12px; }
+    .stats-group-label { font-family: 'Orbitron', sans-serif; font-size: 9px; color: #0af; letter-spacing: 2px; white-space: nowrap; }
+    .stats-item { display: flex; align-items: baseline; gap: 4px; }
+    .stats-item-label { font-size: 9px; color: #4a6a8a; white-space: nowrap; }
+    .stats-item-value { font-family: 'Orbitron', sans-serif; font-size: 11px; color: #c8d8f0; white-space: nowrap; }
+    .stats-sep { color: #1a2a40; font-size: 12px; }
+
+    /* ---- キャラクターマスコット ---- */
+    #char-mascot { position: fixed; bottom: 12px; right: 16px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
+    #char-img { height: 120px; width: auto; image-rendering: pixelated; animation: charIdle 2s ease-in-out infinite; cursor: pointer; }
+    @keyframes charIdle { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+    .char-bubble { position: relative; margin-bottom: 8px; width: 200px; background: rgba(6,12,24,0.96); border: 1px solid #0af; border-radius: 6px; padding: 8px 10px; font-size: 11px; color: #c8d8f0; line-height: 1.5; box-shadow: 0 0 12px rgba(0,170,255,0.35); transition: opacity 0.4s; cursor: default; }
+    .char-bubble::after { content:''; position:absolute; bottom:-7px; right:20px; border-left:7px solid transparent; border-right:7px solid transparent; border-top:7px solid #0af; }
+    .char-bubble-label { font-family:'Orbitron',sans-serif; font-size:8px; color:#0af; letter-spacing:2px; margin-bottom:4px; }
+    .char-bubble-link { font-size:9px; color:#0af; margin-top:5px; display:block; cursor:pointer; text-decoration:underline; }
+
+    @media (max-width: 600px) {
+      .site { height: auto; overflow: visible; }
+      .header { padding: 12px 14px; }
+      .logo { font-size: 14px; }
+      .logo-sub { font-size: 8px; letter-spacing: 2px; }
+      .live-badge { font-size: 9px; padding: 2px 6px; }
+      .header-right span { display: none; }
+      .nav-item { padding: 8px 12px; font-size: 11px; }
+      .content { display: flex; flex-direction: column; overflow: visible; height: auto; }
+      .main { height: auto; overflow-y: visible; border-right: none; border-bottom: 1px solid #1a2a40; padding: 12px; }
+      .sidebar { height: auto; overflow-y: visible; padding: 12px; }
+      .news-title { font-size: 13px; }
+      .news-card .news-title { font-size: 12px; }
+      .yt-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .stat-card { background: #080f1e; border: 1px solid #1a2a40; border-radius: 4px; padding: 10px; text-align: center; }
+    .stat-label { font-size: 9px; color: #4a6a8a; letter-spacing: 1px; margin-bottom: 4px; }
+    .stat-val { font-family: 'Orbitron', sans-serif; font-size: 16px; color: #0af; font-weight: 700; }
+    .stat-unit { font-size: 9px; color: #4a6a8a; }
+    .ranking { margin-bottom: 16px; }
+    .rank-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid #0a1a28; font-size: 12px; cursor: pointer; }
+    .rank-item:hover .rank-title { color: #0af; }
+    .rank-num { font-family: 'Orbitron', sans-serif; font-size: 11px; color: #2a4a6a; min-width: 20px; padding-top: 1px; }
+    .rank-num.top { color: #0af; }
+    .rank-title { color: #a8c0d8; flex: 1; line-height: 1.4; }
+    .rank-count { font-size: 10px; color: #4a6a8a; white-space: nowrap; padding-top: 2px; }
+    .yt-list { display: flex; flex-direction: column; gap: 10px; }
+    .yt-card { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; background: #080f1e; border: 1px solid #1a2a40; border-radius: 4px; overflow: hidden; transition: border-color 0.2s; }
+    .yt-card:hover { border-color: #f003; }
+    .yt-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #0a1628; }
+    .yt-info { padding: 8px 10px 10px; }
+    .yt-channel { font-size: 9px; color: #f00a; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+    .yt-channel::before { content:''; display:inline-block; width:5px; height:5px; background:#f00; border-radius:50%; }
+    .yt-title { font-size: 11px; color: #a8c0d8; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+    .yt-date { font-size: 10px; color: #2a4a6a; }
+    .yt-card { cursor: pointer; }
+    .calendar-widget { background: #080f1e; border: 1px solid #1a2a40; border-radius: 4px; padding: 12px; margin-bottom: 16px; }
+    .cal-header { display: flex; justify-content: space-between; align-items: center; font-family: 'Orbitron', sans-serif; font-size: 11px; color: #0af; margin-bottom: 8px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; }
+    .cal-day-label { font-size: 9px; color: #4a6a8a; padding: 2px 0; }
+    .cal-day { font-size: 10px; color: #6888aa; padding: 3px 0; border-radius: 2px; cursor: pointer; }
+    .cal-day:hover { background: rgba(0,170,255,0.1); color: #0af; }
+    .cal-day.today { background: rgba(0,170,255,0.18); color: #0af; font-weight: 700; }
+    .cal-day.event { color: #f0a; }
+    .cal-day.empty { color: transparent; pointer-events: none; }
+    .footer { background: #060c18; border-top: 1px solid #1a2a40; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-copy { font-size: 10px; color: #2a4a6a; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-link { font-size: 10px; color: #4a6a8a; cursor: pointer; }
+    .footer-link:hover { color: #0af; }
+    @media (max-width: 700px) {
+      .content { grid-template-columns: 1fr; }
+      .sidebar { border-top: 1px solid #1a2a40; }
+      .news-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="site">
+  <div style="position:relative;">
+    <div class="grid-bg"></div>
+    <header class="header">
+      <div class="logo">
+        <div class="logo-dot"></div>
+        <div>PACHINFO<span class="logo-sub">PACHINKO INDUSTRY NEWS</span></div>
+      </div>
+      <div class="header-right">
+      </div>
+    </header>
+  </div>
+  <div class="stats-bar"><!-- STATS_START --><span class="stats-group"><span class="stats-group-label">STORE</span><span class="stats-item"><span class="stats-item-label">店舗</span><span class="stats-item-value">6,059</span></span><span class="stats-sep">|</span><span class="stats-item"><span class="stats-item-label">グループ</span><span class="stats-item-value">1,251</span></span><span class="stats-sep">|</span><span class="stats-item"><span class="stats-item-label">企業</span><span class="stats-item-value">1,632</span></span></span><span class="stats-group"><span class="stats-group-label">PACHIKO</span><span class="stats-item"><span class="stats-item-label">設置台数</span><span class="stats-item-value">1,838,501</span></span><span class="stats-sep">|</span><span class="stats-item"><span class="stats-item-label">スマパチ</span><span class="stats-item-value">473,808</span></span></span><span class="stats-group"><span class="stats-group-label">PACHISLOT</span><span class="stats-item"><span class="stats-item-label">スロット</span><span class="stats-item-value">1,420,907</span></span><span class="stats-sep">|</span><span class="stats-item"><span class="stats-item-label">スマスロ</span><span class="stats-item-value">833,982</span></span></span><!-- STATS_END --></div>
+  <nav class="nav">
+    <a class="nav-item" href="links.html">リンク集</a>
+    <a class="nav-item active" href="#" data-filter="all">トップ</a>
+    <a class="nav-item" href="#" data-filter="reg">規制・法令</a>
+    <a class="nav-item" href="#" data-filter="new">新台情報</a>
+    <a class="nav-item" href="#" data-filter="mfg">メーカー動向</a>
+    <a class="nav-item" href="#" data-filter="store">店舗情報</a>
+    <a class="nav-item" href="#" data-filter="hot">注目</a>
+  </nav>
+  <div class="content">
+    <main class="main">
+<!-- NEWS_START -->
+      <div class="section-title">LATEST NEWS</div>
+      <div style="font-size:10px; color:#2a4a6a; margin-bottom:12px; font-family:'Orbitron',sans-serif;">UPDATED: 2026.06.21 20:24</div>
+      <div class="news-list">
+        
+        <a href="https://chonborista.com/slot/universal-slot/263309/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.21 12:08</div>
+          </div>
+          <div class="news-title">【実戦考察】スマスロゴッドの設定5挙動まとめ！Z- ZONE謎ループや独自の推測要素を徹底分析</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/%e7%9f%b3%e5%b7%9d%e7%9c%8c%e9%81%8a%e5%8d%94%e3%81%8c%e7%ac%ac64%e6%9c%9f%e9%80%9a%e5%b8%b8%e7%b7%8f%e4%bc%9a%e3%80%81%e8%83%bd%e7%99%bb%e5%be%a9%e8%88%88%e3%81%b8%e3%81%ae%e5%8d%94%e5%8a%9b%e7%b6%99/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.20 15:30</div>
+          </div>
+          <div class="news-title">石川県遊協が第64期通常総会、能登復興への協力継続と防犯対策強化も確認</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/%e6%97%a5%e9%9b%bb%e5%8d%94%e3%81%8c%e9%80%9a%e5%b8%b8%e7%b7%8f%e4%bc%9a%e3%80%81%e3%80%8cbt10%e3%80%8d%e5%ae%9f%e7%8f%be%e3%81%b8%e6%99%ae%e5%8f%8a%e6%96%bd%e7%ad%96%e3%82%92%e6%8e%a8%e9%80%b2/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.20 15:00</div>
+          </div>
+          <div class="news-title">日電協が通常総会、「BT10」実現へ普及施策を推進</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64294/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.20 11:49</div>
+          </div>
+          <div class="news-title">現在稼働No.2『スマスロSAOⅡ』評価まとめ｜役物音が台パン、戦国乙女5と人気ツートップ、有利区間切れ後は設定差薄？ etc…</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114242/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.20 10:00</div>
+          </div>
+          <div class="news-title">【IR HISTORY-議論と実践の軌跡-_第4章】国会議事録から見る カジノ・IR議論の変遷</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114548/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 23:57</div>
+          </div>
+          <div class="news-title">福島県遊連が総会、組織一本化に向けた協議などを承認</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114544/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 23:28</div>
+          </div>
+          <div class="news-title">「みんパチ・スロサミ2026」の特設サイトがオープン！</div>
+        </a>
+
+        <a href="https://chonborista.com/slot/universal-slot/256009/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 21:40</div>
+          </div>
+          <div class="news-title">スマスロ バーディーウイング 天井 期待値 やめどき 解析 設定判別</div>
+        </a>
+
+        <a href="https://chonborista.com/slot/amute/259472/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 15:53</div>
+          </div>
+          <div class="news-title">L南国育ち SPECIAL スマスロ 新台 スペック 天井 設定判別 解析まとめ</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64312/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 12:43</div>
+          </div>
+          <div class="news-title">e無職転生（Fields/Newgin）公式PV動画｜アニメ1期＆2期、直LT399帯×ロングST、RUSH演出「魔石多頭竜＆選べるヒロインRUSH」</div>
+        </a>
+
+        <a href="https://p-johojima.jp/yugijoho/post-34394/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 12:39</div>
+          </div>
+          <div class="news-title">『ベガビック』初出店、大手はどう迎える【地域別　店舗・設置状況データまとめ（静岡県富士市）】</div>
+        </a>
+
+        <a href="https://p-johojima.jp/yugijoho/post-34393/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 12:39</div>
+          </div>
+          <div class="news-title">新台導入、「北斗」コーナーが大幅削減【パチスロ主要機種レポート】</div>
+        </a>
+
+        <a href="https://p-johojima.jp/yugijoho/post-34392/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 12:39</div>
+          </div>
+          <div class="news-title">「東京喰種超デカ」、ライト層目立つ【パチンコ主要機種レポート】</div>
+        </a>
+
+        <a href="https://p-johojima.jp/new_machine/post-34398/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 12:37</div>
+          </div>
+          <div class="news-title">【検定情報】「e中森明菜・歌姫伝説～FORFANS～MHJN」と「Lモグモグ風林火山 大海戦の巻ZB」が新規通過　人気シリーズ機の新作が登場予定</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64308/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 12:25</div>
+          </div>
+          <div class="news-title">新台スマスロ『Lとある魔術の禁書目録2』製品版PV動画｜運命変化「幻想リプレイ」、ガブリエルBATTLE勝利で「とある運命の上乗遊技」etc…</div>
+        </a>
+
+        <a href="https://p-johojima.jp/machine_spec/post-34395/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 12:14</div>
+          </div>
+          <div class="news-title">L ULTRAMAN 最終決戦</div>
+        </a>
+
+        <a href="https://p-johojima.jp/news/post-34382/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 11:55</div>
+          </div>
+          <div class="news-title">新機種のPV公開からパチンコホールのリニューアル情報まで、パチンコ関連トピックを総チェック【6月19日まとめ】</div>
+        </a>
+
+        <a href="https://p-johojima.jp/yugijoho/post-34293/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 11:35</div>
+          </div>
+          <div class="news-title">BT機、設置台数は4万5千台規模に　4月以降は伸び悩み</div>
+        </a>
+
+        <a href="https://p-johojima.jp/news/post-34387/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 11:18</div>
+          </div>
+          <div class="news-title">「第4回 香川パチンコ・パチスロの日」が6月20日に開催！ 組合70周年を記念し、全店で地域清掃活動も実施</div>
+        </a>
+
+        <a href="https://p-johojima.jp/news/social_contribution/post-34374/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 11:10</div>
+          </div>
+          <div class="news-title">大商、藤井寺市に10万6,500円を寄付　子ども支援を通じた地域貢献活動を実施</div>
+        </a>
+
+        <a href="https://p-johojima.jp/news/post-34370/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコ情報島</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 11:00</div>
+          </div>
+          <div class="news-title">MIRAIぱちんこ産業連盟、6月定例理事会を開催　AI活用PTが始動</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114525/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 10:43</div>
+          </div>
+          <div class="news-title">石川県遊協が第64期通常総会、玉川理事長が「能登復興への協力」と猛暑対策の「涼み処」設置を呼びかけ</div>
+        </a>
+
+        <a href="https://chonborista.com/slot/sammy-slot/248703/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 08:55</div>
+          </div>
+          <div class="news-title">スマスロ 攻殻機動隊｜天井・設定判別・裏ボタン・解析まとめ【スロット 新台】</div>
+        </a>
+
+        <a href="https://chonborista.com/slot/enta-slot/253191/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 08:35</div>
+          </div>
+          <div class="news-title">スマスロ バイオハザードRE:3｜天井・設定判別・やめどき・解析まとめ</div>
+        </a>
+
+        <a href="https://chonborista.com/slot/oizumi-slot/257968/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 08:30</div>
+          </div>
+          <div class="news-title">LBガルフィー スロット 新台 打ち方 設定判別 解析まとめ</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114477/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 06:50</div>
+          </div>
+          <div class="news-title">【パチスロ新台】「ULTRA CHALLENGE」成功時は、上乗せ枚数が最大100倍に！</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-113913/" class="news-card" data-tag="mfg">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-mfg">メーカー</span>
+            <div class="news-source" style="color:#a0f; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 05:31</div>
+          </div>
+          <div class="news-title">【ダイコク電機×フィールズ協業第1弾】機種嗜好を狙い撃つ！圧倒的コスパな広告配信</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114012/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 04:10</div>
+          </div>
+          <div class="news-title">【独占特集】マルハン北日本カンパニー「ジャパニーズ娯楽」の真価</div>
+        </a>
+
+        <a href="https://chonborista.com/slot/universal-slot/252303/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.19 00:00</div>
+          </div>
+          <div class="news-title">スマスロ ミリオンゴッド-神々の軌跡- スロット 新台 天井 解析まとめ</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64285/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.18 22:01</div>
+          </div>
+          <div class="news-title">化物語 鬼99ver. パチンコ新台｜初打ち評価＆感想、Twitter報告まとめ</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114514/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.18 19:09</div>
+          </div>
+          <div class="news-title">全商協が通常総会を開催、「業界のために役割を果たしていく」と強調</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114492/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.18 17:31</div>
+          </div>
+          <div class="news-title">遊運協が総会、「運送管理表電子化（YRKシステム）の習得に努力を傾注する」</div>
+        </a>
+
+        <a href="https://chonborista.com/pachinko/sammy/263181/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.18 15:37</div>
+          </div>
+          <div class="news-title">e七つの大罪3 パチンコ 新台 スペック・導入日・継続率・情報まとめ</div>
+        </a>
+
+        <a href="https://web-greenbelt.jp/post-114482/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">グリーンべると</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.18 14:09</div>
+          </div>
+          <div class="news-title">MIRAI会見、AI活用や広告宣伝ガイドライン改訂に言及</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/hall/%e3%82%ab%e3%83%a9%e3%83%83%e3%83%88%e3%81%8c%e7%a0%b4%e7%94%a3%e6%89%8b%e7%b6%9a%e3%81%8d%e9%96%8b%e5%a7%8b%e6%b1%ba%e5%ae%9a%e5%8f%97%e3%81%91%e3%82%8b%ef%bc%88%e7%9f%b3%e5%b7%9d%ef%bc%89/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.18 12:21</div>
+          </div>
+          <div class="news-title">カラットが破産手続き開始決定受ける（石川）</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64267/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.17 13:54</div>
+          </div>
+          <div class="news-title">新台スマスロ『Lからくりサーカス2』製品版PV動画｜25インチ透過液晶の専用筐体、上位AT純増8枚、新たな出玉トリガー「SHOW TIME」新搭載 etc…</div>
+        </a>
+
+        <a href="https://chonborista.com/slot/kitadenshi/263127/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.17 13:17</div>
+          </div>
+          <div class="news-title">マイジャグラーⅥ スペック解析｜設定差・機械割・ボーナス確率・導入日まとめ</div>
+        </a>
+
+        <a href="https://chonborista.com/pachinko/fujishouji/263098/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">ちょんぼりすた</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.17 13:14</div>
+          </div>
+          <div class="news-title">【e魔女と野獣】3000個や6000個のループ状態あり！スペック・振り分けまとめ</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64260/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.17 12:16</div>
+          </div>
+          <div class="news-title">冥妃転生-メイヒテンセイ- パチンコ｜初打ち評価＆感想、Twitter報告まとめ</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64252/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 18:49</div>
+          </div>
+          <div class="news-title">パチンコ中森明菜6（ディライト/大一商会）</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64220/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 17:03</div>
+          </div>
+          <div class="news-title">エガブレイブVVV パチンコ｜初打ち評価＆感想、Twitter報告まとめ</div>
+        </a>
+
+        <a href="https://jenepi.jp/2026_0616/" class="news-card" data-tag="store">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-store">店舗</span>
+            <div class="news-source" style="color:#0cf; margin-bottom:0;">ジェネピ</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 15:28</div>
+          </div>
+          <div class="news-title">2026年6月16日　パチンコ店登録ニュース速報</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64228/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 15:12</div>
+          </div>
+          <div class="news-title">PPPAY、提供準備完了｜利用者負担5％＆ホール負担率0.25％、来店時にカウンター決済、月間80,000円上限「パチンコ店用キャッシュレス決済サービス」</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/%e3%80%8c%e5%be%a9%e5%88%bbpr1me%e3%80%8d%e7%ac%ac2%e5%bc%be%ef%bc%81-%e6%ad%b4%e4%bb%a3%e3%81%a7%e6%9c%80%e3%82%82%e9%81%8a%e3%81%b3%e3%82%84%e3%81%99%e3%81%84%e7%89%b9%e5%88%a5%e3%81%aa/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 13:00</div>
+          </div>
+          <div class="news-title">「復刻PR1ME」第2弾！ 歴代で最も遊びやすい“特別なアグネス”が誕生！「PA大海物語Withアグネス・ラム Premium Edition」</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/%e3%82%b0%e3%83%ad%e3%83%bc%e3%83%aa%e3%83%bc%e3%83%8a%e3%82%b9%e3%82%ab%e3%81%8c%e5%bd%b9%e5%93%a1%e9%81%b8%e4%bb%bb-3/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 10:42</div>
+          </div>
+          <div class="news-title">グローリーナスカが役員選任</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/jamp%e3%81%8c%e5%bd%b9%e5%93%a1%e3%82%92%e9%81%b8%e4%bb%bb/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 10:35</div>
+          </div>
+          <div class="news-title">JAMPが役員を選任</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/%e7%ab%b9%e5%b1%8b%e3%81%8c%e5%bd%b9%e5%93%a1%e3%82%92%e9%81%b8%e4%bb%bb/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 09:57</div>
+          </div>
+          <div class="news-title">竹屋が役員を選任</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/%e6%9d%b1%e4%ba%ac%e9%83%bd%e5%85%ac%e5%ae%89%e5%a7%94%e5%93%a1%e4%bc%9a%e6%a4%9c%e5%ae%9a%e9%80%9a%e9%81%8e%e7%8a%b6%e6%b3%81%ef%bc%886%e6%9c%8815%e6%97%a5%ef%bc%89/" class="news-card" data-tag="new">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-new">新台</span>
+            <div class="news-source" style="color:#0af; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.16 09:39</div>
+          </div>
+          <div class="news-title">東京都公安委員会検定通過状況（6月15日）</div>
+        </a>
+
+        <a href="https://ameblo.jp/2ndsales/entry-12969703706.html" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">2ndsales</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.15 22:58</div>
+          </div>
+          <div class="news-title">詐欺師と神様に共通しているのは『絶対にお客様が増えるやり方が有る』というコピー</div>
+        </a>
+
+        <a href="https://pachinko-curation.com/64187/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">パチンコキュレーション</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.15 21:58</div>
+          </div>
+          <div class="news-title">デッドマウントデスプレイ パチンコ｜初打ち評価＆感想、Twitter報告まとめ</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/%e3%81%90%e3%82%8b%e3%81%a3%e3%81%a8%e6%96%b0%e4%bd%93%e9%a8%93%ef%bc%81%e3%80%8c%e3%83%9e%e3%82%a4%e3%82%b8%e3%83%a3%e3%82%b0%e3%83%a9%e3%83%bc%e2%85%b5%e3%80%8d/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.15 18:00</div>
+          </div>
+          <div class="news-title">ぐるっと新体験！「マイジャグラーⅥ」</div>
+        </a>
+
+        <a href="https://www.yugitsushin.jp/news/maker/kyoraku%e3%80%81%e3%80%8c%e3%81%82%e3%81%8a%e3%81%8e%e3%82%8a%e9%ab%98%e6%a0%a1%e3%80%8d%e3%81%a8%e3%81%ae%e3%82%b9%e3%83%9a%e3%82%b7%e3%83%a3%e3%83%ab%e3%82%b3%e3%83%a9%e3%83%9ccm%e3%82%92%e5%85%ac/" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">遊技通信</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.15 17:00</div>
+          </div>
+          <div class="news-title">KYORAKU、「あおぎり高校」とのスペシャルコラボCMを公開</div>
+        </a>
+
+        <a href="https://jenepi.jp/2026_0608/" class="news-card" data-tag="store">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-store">店舗</span>
+            <div class="news-source" style="color:#0cf; margin-bottom:0;">ジェネピ</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.09 16:13</div>
+          </div>
+          <div class="news-title">2026年6月8日　パチンコ店登録ニュース速報</div>
+        </a>
+
+        <a href="https://ameblo.jp/2ndsales/entry-12968876361.html" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">2ndsales</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.08 22:09</div>
+          </div>
+          <div class="news-title">3年後に仕事を失う人の残念な３つの思考</div>
+        </a>
+
+        <a href="https://jenepi.jp/silverback-omurachuo/" class="news-card" data-tag="store">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-store">店舗</span>
+            <div class="news-source" style="color:#0cf; margin-bottom:0;">ジェネピ</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.02 09:15</div>
+          </div>
+          <div class="news-title">シルバーバック大村中央店（仮）がグランドオープン予定/長崎県大村市</div>
+        </a>
+
+        <a href="https://ameblo.jp/2ndsales/entry-12967982130.html" class="news-card" data-tag="hot">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="news-tag tag-hot">注目</span>
+            <div class="news-source" style="color:#f0a; margin-bottom:0;">2ndsales</div>
+            <div style="margin-left:auto; font-size:10px; color:#4a6a8a; white-space:nowrap;">06.01 23:06</div>
+          </div>
+          <div class="news-title">努力して頑張って【選ばれない５つの理由】と【選ばれる3つの条件】</div>
+        </a>
+      </div>
+<!-- NEWS_END -->
+    </main>
+    <aside class="sidebar">
+<!-- SIDEBAR_START -->
+      <div class="section-title">YOUTUBE</div>
+      <div style="font-size:10px; color:#2a4a6a; margin-bottom:12px; font-family:'Orbitron',sans-serif;">UPDATED: 2026.06.21 20:24</div>
+      <div class="yt-list">
+        
+        <a href="https://www.youtube.com/watch?v=BKm_Ry7LrH0" class="yt-card">
+          <img src="https://img.youtube.com/vi/BKm_Ry7LrH0/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">スロパチステーション</div>
+            <div class="yt-title">【GOD-神々の軌跡-】確定役引くまでタバコ吸えません【いそまるの成り上がり回胴録第964話】[パチスロ][スロット]#いそまる#よしき</div>
+            <div class="yt-date">06.21</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=c7oJJFeP9w4" class="yt-card">
+          <img src="https://img.youtube.com/vi/c7oJJFeP9w4/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">寺井一択の爆裂最強限界突破TV</div>
+            <div class="yt-title">【バイオ史上最強ボーナス】遂に引いたプレミアム！脅威のヒキでCM確定「寺やる730話」【スマスロ バイオハザードRE:3】【パチスロパチンコ】</div>
+            <div class="yt-date">06.20</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=ZTWUiGmjRhk" class="yt-card">
+          <img src="https://img.youtube.com/vi/ZTWUiGmjRhk/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">平和</div>
+            <div class="yt-title">【切り抜き】「ただパチ」ゲストで過去一のカオス回！？【L戦国乙女5 業火を穿つ宿焔の双刃】【ハルルナ】#234</div>
+            <div class="yt-date">06.19</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=kLJ4B15WtIs" class="yt-card">
+          <img src="https://img.youtube.com/vi/kLJ4B15WtIs/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">山佐</div>
+            <div class="yt-title">クリエイターズレボリューション#09 嵐山・ジョーンズ with 助手HYO.くん【スマスロケロット5BT】#パチスロ #新台</div>
+            <div class="yt-date">06.19</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=lLK5mVLKy7k" class="yt-card">
+          <img src="https://img.youtube.com/vi/lLK5mVLKy7k/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">フィールズ</div>
+            <div class="yt-title">【公式】「e 無職転生 〜異世界行ったら本気だす〜」プロモーションムービー第2弾</div>
+            <div class="yt-date">06.19</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=INazzWB9yjw" class="yt-card">
+          <img src="https://img.youtube.com/vi/INazzWB9yjw/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">藤商事</div>
+            <div class="yt-title">【スロット | 本編PV】スマスロ とある魔術の禁書目録2《藤商事公式》</div>
+            <div class="yt-date">06.19</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=NlXwSgyRuXs" class="yt-card">
+          <img src="https://img.youtube.com/vi/NlXwSgyRuXs/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">SANKYO</div>
+            <div class="yt-title">【公式】スカイキッズIII【もう一度打ちたい！】1993年 #レトロ台 #sankyo #演出 #レトロパチンコ #実戦 #平成</div>
+            <div class="yt-date">06.17</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=Oc8vgQSiviI" class="yt-card">
+          <img src="https://img.youtube.com/vi/Oc8vgQSiviI/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">京楽</div>
+            <div class="yt-title">「あおぎり高校 × KYORAKU」スペシャルコラボCM</div>
+            <div class="yt-date">06.15</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=J-WUH9l1xSE" class="yt-card">
+          <img src="https://img.youtube.com/vi/J-WUH9l1xSE/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">サミー</div>
+            <div class="yt-title">【公式】「e 東京リベンジャーズ 聖夜決戦編」プロモーションムービー＜2026年7月6日全国導入予定＞</div>
+            <div class="yt-date">06.12</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=e3S6oWxENfQ" class="yt-card">
+          <img src="https://img.youtube.com/vi/e3S6oWxENfQ/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">ベルコ</div>
+            <div class="yt-title">【公式】Ｌすーぱぁびん娘 PV</div>
+            <div class="yt-date">05.25</div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=yaVPNwJt-2M" class="yt-card">
+          <img src="https://img.youtube.com/vi/yaVPNwJt-2M/mqdefault.jpg" class="yt-thumb" loading="lazy" alt="">
+          <div class="yt-info">
+            <div class="yt-channel">高尾</div>
+            <div class="yt-title">【e 学園黙示録ハイスクール・オブ・ザ・デッド３】機種PV</div>
+            <div class="yt-date">05.25</div>
+          </div>
+        </a>
+      </div>
+<!-- SIDEBAR_END -->
+    </aside>
+  </div>
+  <footer class="footer">
+    <div class="footer-copy">© 2026 PACHINFO</div>
+    <div class="footer-links">
+      <span class="footer-link">利用規約</span>
+      <span class="footer-link">プライバシー</span>
+      <span class="footer-link">お問い合わせ</span>
+      <span class="footer-link">RSS</span>
+    </div>
+  </footer>
+</div>
+<script>
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const d = String(now.getDate()).padStart(2,'0');
+  const dateEl = document.getElementById('current-date');
+  if (dateEl) dateEl.textContent = y + '.' + m + '.' + d;
+
+  if (document.getElementById('cal-grid')) {
+    const eventDays = [9, 12, 18, 23, 30];
+    let calYear = now.getFullYear();
+    let calMonth = now.getMonth();
+    function renderCalendar() {
+      document.getElementById('cal-title').textContent = calYear + ' / ' + String(calMonth+1).padStart(2,'0');
+      const grid = document.getElementById('cal-grid');
+      const labels = Array.from(grid.querySelectorAll('.cal-day-label'));
+      grid.innerHTML = '';
+      labels.forEach(l => grid.appendChild(l));
+      const first = new Date(calYear, calMonth, 1).getDay();
+      const last = new Date(calYear, calMonth+1, 0).getDate();
+      for (let i = 0; i < first; i++) {
+        const el = document.createElement('div'); el.className = 'cal-day empty'; el.textContent = '0'; grid.appendChild(el);
+      }
+      for (let i = 1; i <= last; i++) {
+        const el = document.createElement('div'); el.className = 'cal-day';
+        if (i === now.getDate() && calMonth === now.getMonth() && calYear === now.getFullYear()) el.classList.add('today');
+        if (eventDays.includes(i)) el.classList.add('event');
+        el.textContent = i; grid.appendChild(el);
+      }
+    }
+    renderCalendar();
+    const btns = document.querySelectorAll('.cal-header span');
+    if (btns[0]) btns[0].addEventListener('click', () => { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); });
+    if (btns[2]) btns[2].addEventListener('click', () => { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); });
+  }
+
+  const NO_ARTICLES_MSG = '<div id="no-articles" style="padding:32px 0; text-align:center; color:#2a4a6a; font-family:\'Orbitron\',sans-serif; font-size:11px; letter-spacing:3px;">NO ARTICLES FOUND</div>';
+
+  function applyFilter(filter) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.nav-item[data-filter="${filter}"]`).classList.add('active');
+
+    const featured = document.querySelectorAll('.news-featured[data-tag]');
+    const cards = document.querySelectorAll('.news-card[data-tag]');
+    const newsList = document.querySelector('.news-list');
+    const existing = document.getElementById('no-articles');
+    if (existing) existing.remove();
+
+    let visibleCards = 0;
+
+    featured.forEach(el => {
+      const show = filter === 'all' || el.dataset.tag === filter;
+      el.style.display = show ? 'block' : 'none';
+      if (show) visibleCards++;
+    });
+    cards.forEach(el => {
+      const show = filter === 'all' || el.dataset.tag === filter;
+      el.style.display = show ? 'block' : 'none';
+      if (show) visibleCards++;
+    });
+
+    if (visibleCards === 0 && newsList) {
+      newsList.insertAdjacentHTML('beforebegin', NO_ARTICLES_MSG);
+    }
+  }
+
+  document.querySelectorAll('.yt-card').forEach(card => {
+    card.addEventListener('click', e => {
+      e.preventDefault();
+      const href = card.getAttribute('href');
+      if (!href) return;
+      const sw = 860, sh = 520;
+      const l = Math.round(window.screenX + (window.outerWidth - sw) / 2);
+      const t = Math.round(window.screenY + (window.outerHeight - sh) / 2);
+      window.open(href, 'yt-popup', `width=${sw},height=${sh},left=${l},top=${t},toolbar=0,menubar=0,scrollbars=0`);
+    });
+  });
+
+  document.querySelectorAll('.nav-item[data-filter]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      applyFilter(el.dataset.filter);
+    });
+  });
+</script>
+
+<!-- CHAR_ARTICLES_START --><script>var CHAR_ARTICLES=[{"t": "沖海6whitえなこはフルラウンド獲得時にほぼ必ずえなこラウンドを視聴しなきゃいけない事実に耐えきれる人のみ打つことを勧める", "u": "https://parlourfullslotl.com/archives/179655"}, {"t": "親が救急搬送されて来店キャンセルせざるを得ないとか、頼むから演者を許したってくれ", "u": "https://parlourfullslotl.com/archives/179683"}, {"t": "じーま。さん「よくハーフですか？”って聞かれるけどなめてんの？」→なんの根拠にもならないマイナンバーカード提示へ", "u": "https://parlourfullslotl.com/archives/179651"}, {"t": "Pエヴァンゲリオン15で15時時点で10万発突破！コンプリート機能がないから終わらないwww", "u": "https://parlourfullslotl.com/archives/179697"}, {"t": "「L虚構推理」「異世界かるてっとBT」「eライザのアトリエ」が稼働貢献終了！", "u": "https://parlourfullslotl.com/archives/179691"}, {"t": "「eF機動戦士ガンダムSEEDクライマックス」の検定がBisty名義なのはなんで？", "u": "https://parlourfullslotl.com/archives/179625"}, {"t": "暴言演者さんを擁護しようとした人「Twitterにわくゴミなんて死体の裏みたらうじゃうじゃいるウジ虫みたいなもん」←擁護出来てないと話題に", "u": "https://parlourfullslotl.com/archives/179678"}, {"t": "Xまとめ垢「たかスロ」のアンチアカウント「歯無スロ」の執念が恐すぎる", "u": "https://parlourfullslotl.com/archives/179680"}, {"t": "でちゃう！翔火さん「ちちのひ」", "u": "https://parlourfullslotl.com/archives/179674"}, {"t": "来店に現れる痛いファンに女性演者さんが我慢の限界に達する「あなたが1番常連さんからのクレームが多かったです、これ以上演者さんや周りに迷惑かけないで…」", "u": "https://parlourfullslotl.com/archives/179664"}, {"t": "パチンカスの皆さん、7月7日休み取る？", "u": "https://parlourfullslotl.com/archives/179647"}, {"t": "もうパチンコは疑似スロ化してCZ・天井・引き戻し全部入れろよ", "u": "https://parlourfullslotl.com/archives/179636"}, {"t": "パチ演者とは仮に親が亡くなり仕事に穴をあけざるを得ない状況になった時、仕事に出ても忌引してもどちらにせよ叩かれる職業", "u": "https://parlourfullslotl.com/archives/179605"}, {"t": "ファンに何も対価を与えてないのに、来店でプレゼント貰ったり配信で投げ銭貰えてるのに急に、それが失くなってブチギレるのってなんでだろう", "u": "https://parlourfullslotl.com/archives/179608"}, {"t": "【悲報】「Lビッグドリーム THE GOLDEN PUSHER」「Lバイオハザード RE:3」が稼働貢献が4週で終了！宝箱じゃなくてゴミ箱と言われてしまう", "u": "https://parlourfullslotl.com/archives/179615"}, {"t": "7月来店が5件しかない麻雀系演者さん「ゴミがうるせえな」とアンチリプに暴言", "u": "https://parlourfullslotl.com/archives/179601"}, {"t": "愛の不時着の甘デジってRUSH天井みたいなの付いてるけどこんなの有りなの？", "u": "https://parlourfullslotl.com/archives/179538"}, {"t": "今のパチンコがつまらないんじゃなくて、ホールが釘締めてるからつまらなくなってるんじゃね？", "u": "https://parlourfullslotl.com/archives/179586"}, {"t": "女性演者さん、家族が病院搬送されて急遽来店キャンセル→個人事業主の大先輩が「仕事に穴空けるって一番やっちゃいけないって知らないのかなぁ？」と説教開始", "u": "https://parlourfullslotl.com/archives/179581"}, {"t": "麻雀系来店演者さん達が事前に法令違反を指摘されていた参加型出玉バトル企画を決行して参加者に賞品を渡してしまう→警察への通報など面倒くさい事態に", "u": "https://parlourfullslotl.com/archives/179572"}];</script><!-- CHAR_ARTICLES_END -->
+
+<div id="char-mascot">
+  <div class="char-bubble" id="char-bubble">
+    <div class="char-bubble-label">INFO</div>
+    <span id="char-bubble-text">記事を読み込み中...</span>
+    <span class="char-bubble-link" id="char-bubble-link">▶ 記事を読む</span>
+  </div>
+  <img id="char-img" src="character/character.png" alt="mascot">
+</div>
+
+<script>
+(function() {
+  var bubble     = document.getElementById('char-bubble');
+  var bubbleText = document.getElementById('char-bubble-text');
+  var bubbleLink = document.getElementById('char-bubble-link');
+  var charImg    = document.getElementById('char-img');
+  var artIdx = 0;
+
+  function showArticle(idx) {
+    if (!CHAR_ARTICLES || CHAR_ARTICLES.length === 0) return;
+    var art = CHAR_ARTICLES[idx % CHAR_ARTICLES.length];
+    bubble.style.opacity = '0';
+    setTimeout(function() {
+      bubbleText.textContent = art.t;
+      bubble.style.opacity = '1';
+    }, 300);
+  }
+
+  function openArticle() {
+    if (!CHAR_ARTICLES || CHAR_ARTICLES.length === 0) return;
+    var art = CHAR_ARTICLES[artIdx % CHAR_ARTICLES.length];
+    window.location.href = art.u;
+  }
+
+  // 吹き出しの「記事を読む」リンクのみ遷移
+  bubbleLink.addEventListener('click', openArticle);
+  // キャラ画像クリックでも遷移
+  charImg.addEventListener('click', openArticle);
+  // 吹き出し本体クリックは何もしない（伝播止め）
+  bubble.addEventListener('click', function(e) { e.stopPropagation(); });
+
+  if (CHAR_ARTICLES.length > 0) {
+    showArticle(0);
+    setInterval(function() { artIdx++; showArticle(artIdx); }, 10000);
+  }
+})();
+</script>
+</body>
+</html>

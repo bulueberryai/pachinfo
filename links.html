@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PACHINFO - リンク集</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #050810; }
+    ::-webkit-scrollbar-thumb { background: #0af4; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #0af; box-shadow: 0 0 6px #0af; }
+    body { background: #050810; }
+    .site { background: #050810; color: #c8d8f0; font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    .header { position: relative; background: #060c18; border-bottom: 1px solid #0af; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
+    .header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, transparent, #0af, #f0a, #0af, transparent); }
+    .logo { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; color: #0af; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .logo-dot { width: 10px; height: 10px; background: #0af; border-radius: 50%; }
+    .logo-sub { font-size: 10px; color: #58a; font-weight: 400; letter-spacing: 4px; display: block; margin-top: 2px; }
+    .nav { background: #080f1e; border-bottom: 1px solid #1a2a40; display: flex; gap: 0; overflow-x: auto; }
+    .nav-item { padding: 10px 18px; font-size: 12px; color: #6888aa; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; letter-spacing: 1px; text-decoration: none; display: block; }
+    .nav-item:hover { color: #0af; }
+    .nav-item.active { color: #0af; border-bottom-color: #0af; background: rgba(0,170,255,0.05); }
+    .main { padding: 32px 24px; flex: 1; max-width: 900px; width: 100%; margin: 0 auto; }
+    .section-title { font-family: 'Orbitron', sans-serif; font-size: 11px; color: #0af; letter-spacing: 3px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .section-title::after { content:''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,170,255,0.4), transparent); }
+    .link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 40px; }
+    .link-card { display: block; background: #080f1e; border: 1px solid #1a2a40; border-left: 3px solid #0af4; border-radius: 4px; padding: 16px 18px; text-decoration: none; color: inherit; transition: border-color 0.2s, background 0.2s; }
+    .link-card:hover { border-color: #0af; background: #0a1628; }
+    .link-card.hot   { border-left-color: #f0a4; } .link-card.hot:hover   { border-left-color: #f0a; }
+    .link-card.new   { border-left-color: #0f84; } .link-card.new:hover   { border-left-color: #0f8; }
+    .link-card.reg   { border-left-color: #fa04; } .link-card.reg:hover   { border-left-color: #fa0; }
+    .link-card.mfg   { border-left-color: #a0f4; } .link-card.mfg:hover   { border-left-color: #a0f; }
+    .link-card.store { border-left-color: #0cf4; } .link-card.store:hover { border-left-color: #0cf; }
+    .link-name { font-size: 14px; font-weight: 700; color: #d8eeff; margin-bottom: 6px; }
+    .link-url  { font-size: 11px; color: #4a6a8a; word-break: break-all; }
+    .link-tag  { font-size: 9px; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; padding: 2px 8px; border-radius: 2px; display: inline-block; margin-bottom: 8px; }
+    .tag-hot   { background: rgba(255,0,170,0.08);  border: 1px solid #f0a; color: #f0a; }
+    .tag-new   { background: rgba(0,255,136,0.05);  border: 1px solid #0f8; color: #0f8; }
+    .tag-reg   { background: rgba(255,170,0,0.05);  border: 1px solid #fa0; color: #fa0; }
+    .tag-mfg   { background: rgba(170,0,255,0.05);  border: 1px solid #a0f; color: #a0f; }
+    .tag-store { background: rgba(0,204,255,0.06);  border: 1px solid #0cf; color: #0cf; }
+    .tag-auto  { background: rgba(0,170,255,0.06);  border: 1px solid #0af; color: #0af; }
+    .footer { background: #060c18; border-top: 1px solid #1a2a40; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #2a4a6a; }
+    @media (max-width: 600px) {
+      .main { padding: 20px 14px; }
+      .link-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="site">
+  <header class="header">
+    <a href="index.html" class="logo">
+      <div class="logo-dot"></div>
+      <div>PACHINFO<span class="logo-sub">PACHINKO INDUSTRY NEWS</span></div>
+    </a>
+  </header>
+  <nav class="nav">
+    <a class="nav-item active" href="links.html">リンク集</a>
+    <a class="nav-item" href="index.html">トップ</a>
+    <a class="nav-item" href="index.html">規制・法令</a>
+    <a class="nav-item" href="index.html">新台情報</a>
+    <a class="nav-item" href="index.html">メーカー動向</a>
+    <a class="nav-item" href="index.html">店舗情報</a>
+    <a class="nav-item" href="index.html">注目</a>
+  </nav>
+  <main class="main">
+    <div class="section-title">NEWS SOURCES</div>
+    <div class="link-grid">
+      <a href="https://yugi-nippon.com/" class="link-card" target="_blank">
+        <div class="link-tag tag-auto">ニュース</div>
+        <div class="link-name">遊技日本</div>
+        <div class="link-url">yugi-nippon.com</div>
+      </a>
+      <a href="https://web-greenbelt.jp/" class="link-card" target="_blank">
+        <div class="link-tag tag-auto">ニュース</div>
+        <div class="link-name">グリーンべると</div>
+        <div class="link-url">web-greenbelt.jp</div>
+      </a>
+      <a href="https://jenepi.jp/" class="link-card store" target="_blank">
+        <div class="link-tag tag-store">店舗</div>
+        <div class="link-name">ジェネピ</div>
+        <div class="link-url">jenepi.jp</div>
+      </a>
+      <a href="https://chonborista.com/" class="link-card" target="_blank">
+        <div class="link-tag tag-auto">ニュース</div>
+        <div class="link-name">ちょんぼりすた</div>
+        <div class="link-url">chonborista.com</div>
+      </a>
+      <a href="https://www.yugitsushin.jp/" class="link-card" target="_blank">
+        <div class="link-tag tag-auto">ニュース</div>
+        <div class="link-name">遊技通信</div>
+        <div class="link-url">yugitsushin.jp</div>
+      </a>
+      <a href="https://pachinko-curation.com/" class="link-card" target="_blank">
+        <div class="link-tag tag-auto">ニュース</div>
+        <div class="link-name">パチンコキュレーション</div>
+        <div class="link-url">pachinko-curation.com</div>
+      </a>
+      <a href="https://ameblo.jp/2ndsales/" class="link-card hot" target="_blank">
+        <div class="link-tag tag-hot">注目</div>
+        <div class="link-name">2ndsales</div>
+        <div class="link-url">ameblo.jp/2ndsales</div>
+      </a>
+      <a href="https://p-johojima.jp/" class="link-card" target="_blank">
+        <div class="link-tag tag-auto">ニュース</div>
+        <div class="link-name">パチンコ情報島</div>
+        <div class="link-url">p-johojima.jp</div>
+      </a>
+    </div>
+  </main>
+  <footer class="footer">
+    <div>© 2026 PACHINFO</div>
+  </footer>
+</div>
+</body>
+</html>
